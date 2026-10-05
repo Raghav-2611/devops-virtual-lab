@@ -1,0 +1,39 @@
+- name: Configure DevOps Server
+  hosts: servers
+  become: yes
+
+  tasks:
+
+    - name: Update system packages
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Install Docker
+      dnf:
+        name: docker
+        state: present
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Download kubectl
+      get_url:
+        url: https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: Download Minikube
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        mode: '0755'
